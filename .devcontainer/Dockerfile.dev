@@ -1,0 +1,56 @@
+# ----- Go -----
+FROM golang:1.19-alpine as go
+
+RUN apk update && apk add git
+
+RUN go install -v golang.org/x/tools/gopls@latest \
+    && go install -v github.com/cweill/gotests/gotests@latest \
+    && go install -v github.com/fatih/gomodifytags@latest \
+    && go install -v github.com/josharian/impl@latest \
+    && go install -v github.com/haya14busa/goplay/cmd/goplay@latest \
+    && go install -v github.com/go-delve/delve/cmd/dlv@latest \
+    && go install -v honnef.co/go/tools/cmd/staticcheck@latest
+
+# ----- PostgreSQL -----
+FROM postgres:13-alpine as db
+ENV LANG ja_JP.utf8
+EXPOSE 5432
+
+# ----- Node ------
+FROM node:18-alpine as node
+
+#  ----- Develop -----
+FROM alpine:latest as dev
+
+ARG GO_VERSION=1.19
+ENV PATH $PATH:/usr/local/go/bin/:/usr/local/go/bin/go:/go/bin
+# ENV PATH $PATH:/home/vscode/go/bin
+
+WORKDIR /app
+
+RUN apk update && \
+    apk add fish && \
+    apk add curl && \
+    apk add tzdata && \
+    apk add git && \
+    apk add openssh && \
+    apk add make && \
+    apk add gcc && \
+    apk add musl-dev
+
+# go
+COPY --from=go /usr/local/bin /usr/local/bin
+COPY --from=go /usr/local/go /usr/local/go
+COPY --from=go /go/bin /go/bin
+# COPY --from=go /go/package ${GOPATH}/pkg
+
+# node
+COPY --from=node /usr/local/bin /usr/local/bin
+COPY --from=node /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/npm
+COPY --from=node /opt/yarn* /opt/yarn
+
+RUN ln -fs /opt/yarn/bin/yarn /usr/local/bin/yarn && \
+    ln -fs /opt/yarn/bin/yarnpkg /usr/local/bin/yarnpkg
+
+# Gin Port
+EXPOSE 8080

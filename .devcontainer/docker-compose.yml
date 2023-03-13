@@ -1,0 +1,50 @@
+version: "3"
+
+services:
+  db:
+    container_name: container_postgres
+    build:
+      context: .
+      dockerfile: ./Dockerfile.dev
+      target: db
+    environment:
+      POSTGRES_USER: docker_user
+      POSTGRES_PASSWORD: docker_user
+      POSTGRES_DB: docker_db
+      TZ: Asia/Tokyo
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+
+  pgadmin:
+    container_name: container_pgadmin
+    image: dpage/pgadmin4
+    volumes:
+      - pgadmindata:/var/lib/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: root@example.com
+      PGADMIN_DEFAULT_PASSWORD: GAdab0568.
+      TZ: Asia/Tokyo
+    depends_on:
+      - db
+    ports:
+      - "5050:80"
+
+  dev:
+    container_name: devcontainer
+    build:
+      context: .
+      dockerfile: ./Dockerfile.dev
+      target: dev
+    working_dir: /app
+    volumes:
+      - ../client:/app/client:cached
+      - ../client/node_modules:/app/client/node_modules
+      - ../server:/app/server:cached
+    tty: true
+
+volumes:
+  dbdata:
+  pgadmindata:

@@ -1,0 +1,42 @@
+{
+  "name": "AozoraTyping Devcontainer",
+  "dockerComposeFile": ["docker-compose.yml"],
+  "service": "dev",
+  "workspaceFolder": "/app",
+  "forwardPorts": [5173, 5432, 5050],
+  "shutdownAction": "none",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.tabSize": 2,
+        "editor.formatOnPaste": true,
+        "editor.formatOnType": true,
+        "files.encoding": "utf8",
+        "eslint.nodePath": "/app/client",
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[go]": {
+          "editor.defaultFormatter": "golang.go",
+          "editor.insertSpaces": true,
+          "editor.formatOnSave": true,
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+          }
+        },
+        "[javascript]": {
+          "editor.formatOnSave": true
+        },
+        "[typescript]": {
+          "editor.formatOnSave": true
+        }
+      },
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "mhutchie.git-graph",
+        "donjayamanne.githistory",
+        "oderwat.indent-rainbow",
+        "golang.go"
+      ]
+    }
+  }
+}
